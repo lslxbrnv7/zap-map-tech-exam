@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use App\Models\Location;
 
 class ImportDataFromCsv extends Command
@@ -28,13 +28,14 @@ class ImportDataFromCsv extends Command
     public function handle()
     {
         $fileName = 'data.csv';
-        $filePath = '/uploads/'.$fileName;
+        $filePath = public_path('/uploads/'.$fileName);
 
-        if (!Storage::exists($filePath)) {
+        if (!File::exists($filePath)) {
             $this->error('The specified file does not exist.');
             return 0;
         }
-        $file = Storage::get($filePath);
+        $file = File::get($filePath);
+
         $array = array_map("str_getcsv", explode("\n", $file));
 
         Location::exists() ? Location::truncate() : null;
@@ -48,7 +49,6 @@ class ImportDataFromCsv extends Command
             ]);
             $this->info($data[0] . ' created!');
         }
-
         $this->info('Data has been imported!');
     }
 }
